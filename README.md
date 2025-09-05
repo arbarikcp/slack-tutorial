@@ -264,5 +264,105 @@ Inside the component, title will be of type string | undefined.
     ```
 
 
+## Chapter-3: Convex basics
+- https://www.convex.dev/
+- https://docs.convex.dev/home
+- **Add convex to our project**
+    - go to our project folder, `bun add convex`
+- **Start convex for our project**
+    - `bunx convex dev`
+    -  if we are not using local convex, It will ask to login and connect to our cloud instance.
+    - It will create the convex confis like URL to **.env.local**
+    - ```
+                ? Welcome to Convex! Would you like to login to your account? Login or create 
+        an account
+        Welcome to developing with Convex, let's get you logged in.
+        ? Device name: Bhakti’s MacBook Air
+        Visit https://auth.convex.dev/device?user_code=DTNH-XLLL to finish logging in.
+        You should see the following code which expires in 299 seconds: DTNH-XLLL
+        ? Open the browser? Yes
+        ✔ Saved credentials to ~/.convex/config.json
+        ? Project name: slack-tutorial
+        ✔ Created project slack-tutorial-5930b, manage it at https://dashboard.convex.dev/t/skyhighdemo58-58/slack-tutorial-5930b
+        ✔ Provisioned a dev deployment and saved its:
+            name as CONVEX_DEPLOYMENT to .env.local
+            URL as NEXT_PUBLIC_CONVEX_URL to .env.local
+
+        Write your Convex functions in convex/
+        Give us feedback at https://convex.dev/community or support@convex.dev
+        View the Convex dashboard at https://dashboard.convex.dev/d/polished-owl-229
+   ```
+-  Visit our convex data url to check our newly created project.
+- Also in our local it wil create a **convex** folder   , will generate generic methods to **query** and **update** the db 
+- **Create and add some data to convex table**
+- `bunx convex import --table tasks sampleData.jsonl` -> this will take the local jsonl file and create a table by name tasks in convex project.
+- **Write a method to query the tasks table**
+- Inside convex add tasks.ts
+- ```
+        import { query } from "./_generated/server";
+
+        export const get = query({
+        args: {},
+        handler: async (ctx) => {
+            return await ctx.db.query("tasks").collect();
+        },
+        });
+   ```
+-  This uses the generated query method to fetch the data from convex tasks table.
+- **Create a convex-client-provider**  
+    - components/convex-client-provider.tsx
+- Then we can use it in our page.tsx   
+- Add it to layout.tsx SO that this convex-client-provider is available to all pages.
+
+### Understanding next.js App Router Architecture.
+- When you chose App Router during project setup, Next.js created a app/ directory–based routing system.
+- Inside app/, two very special files exist:
+
+    - page.tsx
+    - layout.tsx
+
+- They work together to define your UI and how pages share layouts.
+- **page.tsx**:
+    - Defines a route/page in your app.
+    - Each folder inside app/ that contains a page.tsx becomes a route.
+- ```
+    app/
+    ├─ page.tsx          → `/` (home page)
+    ├─ about/
+    │   └─ page.tsx      → `/about`
+    └─ contact/
+        └─ page.tsx      → `/contact`
+
+    ```
+- **layout.tsx**:
+    - Defines a layout wrapper for pages inside its folder.
+    - Layouts are shared across multiple pages.
+    - They persist across navigation (unlike pages, which reload).
+- ```
+        app/
+    ├─ layout.tsx        → Root layout (applies to the whole app)
+    ├─ dashboard/
+    │   ├─ layout.tsx    → Layout for all `/dashboard/*` pages
+    │   ├─ page.tsx      → `/dashboard`
+    │   └─ settings/
+    │       └─ page.tsx  → `/dashboard/settings`
+    ```
+- **layout.tsx** must include a children prop to render nested pages:   
+- ```
+    export default function RootLayout({ children }: { children: React.ReactNode }) {
+    return (
+        <html lang="en">
+        <body>
+            <header>Header (always visible)</header>
+            <main>{children}</main>   {/* This is where page.tsx content renders */}
+            <footer>Footer (always visible)</footer>
+        </body>
+        </html>
+    );
+    }
+    ```
+    
+
+
 
 
