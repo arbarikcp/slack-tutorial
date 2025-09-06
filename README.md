@@ -411,7 +411,8 @@ Inside the component, title will be of type string | undefined.
 
 - **Update auth.ts**: Add github provider to the auth.ts file.
 - Enable github authentication in convex. 
-- Create a github oAuth app, and get the client id and client secret.
+- Create a github oAuth app, get the redirect url from convex project settings -> Url & deploy key -> HTTP Actions URL
+ and get the client id and client secret.
 - ` npx convex env set AUTH_GITHUB_ID yourgithubclientid`
 - ` npx convex env set AUTH_GITHUB_SECRET yourgithubclientsecret`
 - After adding this we can see these env variable in convex project settings.-> Environment variables.
@@ -436,3 +437,8 @@ Inside the component, title will be of type string | undefined.
 - **Add a signout button on home page**: use the signOut function of useAuthActions() to sign out the user, add it to home page.
     
 - **Note**: Now when we go to any page it will redirect to Signin page, once we click on github Authentication it will redirect to github, once Authenticated it will add that user to user table and other auth info to other auth tables in Convex.
+
+## Chapter 5 - Adding google Authentication
+- Create a google oAuth app, get the redirect url from convex project settings -> Url & deploy key -> HTTP Actions URL
+- Add the google provider to the auth.ts file.
+- In SignInCard component, add google provider signin button, and call signIn function with the provider name (google) as a parameter.

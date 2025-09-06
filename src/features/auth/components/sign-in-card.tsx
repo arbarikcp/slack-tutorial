@@ -24,9 +24,12 @@ export const SignInCard = ({setState} : SignInCardprops) =>{
     const {signIn} = useAuthActions()
     const[email, setEmail] = useState("")
     const[password, setPassword] = useState("")
+    const[pending,setPending] = useState(false)
 
     const handleProviderSignIn = (value: "github" | "google") => {
+        setPending(true)
         signIn(value)
+            .finally(() => {setPending(false)})
     }
 
     return (
@@ -65,17 +68,17 @@ export const SignInCard = ({setState} : SignInCardprops) =>{
                 <Separator/>
                 <div className="flex flex-col gap-y-2.5">
                     <Button 
-                        disabled={false}
-                        onClick={() =>{}}
+                        disabled={pending}
+                        onClick={() =>{handleProviderSignIn("google")}}
                         variant="outline"
                         size="lg"
-                        className="w-full relative"
+                        className="w-full relative hover:cursor-pointer"
                     >
                         <FcGoogle className="size-5 absolute top-3 left-2.5"/>
                         Continue with Google
                     </Button>
                     <Button 
-                        disabled={false}
+                        disabled={pending}
                         onClick={() =>{handleProviderSignIn("github")}}
                         variant="outline"
                         size="lg"
