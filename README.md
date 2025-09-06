@@ -442,3 +442,44 @@ Inside the component, title will be of type string | undefined.
 - Create a google oAuth app, get the redirect url from convex project settings -> Url & deploy key -> HTTP Actions URL
 - Add the google provider to the auth.ts file.
 - In SignInCard component, add google provider signin button, and call signIn function with the provider name (google) as a parameter.
+
+## chapter 6 - Adding password Authentication & singup flow
+- Add password authentication to the auth.ts file.
+- Add signup flow to the signin card component.
+- Add signup flow to the signup card component.
+- ```
+        const onPasswordSignIn = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+    
+        setPending(true);
+        signIn("password", { email, password, flow: "signIn" })
+          .catch(() => {
+            setError("Invalid email or password");
+          })
+          .finally(() => {
+            setPending(false);
+          });
+      };
+    ```
+- get the `signIn` function from useAuthActions() to call it in the signin card component. both signIn and signUp flow are same, just the flow param value is different.
+- Also As it is a form submit, we need to prevent the default behavior of the form submit and call the signIn function.
+- **showing error message if email or password is invalid**
+- We define a state variable `error` to store the error message and display it in the signin and signup card component.
+- Inside the signin and signup card we we added a place holder to show if there is error.
+- ```  
+                {!!error && (
+                <div className="bg-destructive/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive mb-6">
+                <TriangleAlert className="size-4" />
+                <p>{error}</p>
+                </div>
+            )}
+    ```
+- **!!error** : this syntax converts the error to a boolean value. 
+   - If error is truthy (has a value) → !!error becomes true
+   - If error is falsy (undefined or null) → !!error becomes false
+   - Handles edge cases where error might be an empty string or 0
+    - these are Edge cases which handlled by this !! syntax.
+    - `"" && <div>Error message</div>  // Renders: "" (empty string, not nothing!)`
+    - `0 && <div>Error message</div>   // Renders: 0 (shows "0" on screen!)`
+    - `false && <div>Error message</div> // Renders: false (shows "false" on screen!)`
+    - All these cases are handled by this !! syntax.
