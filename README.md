@@ -362,7 +362,77 @@ Inside the component, title will be of type string | undefined.
     }
     ```
     
+## Chapter4 - Convex Auth & adding github Authentication
+- https://labs.convex.dev/auth/setup
+- **Install convex auth library** : `bunx add @convex-dev/auth @auth/core@0.37.0` 
+- **Run the initialization command**: `npx @convex-dev/auth`
+- This sets up your project for authenticating via the library. This will create files inside convex folder, like `auth.ts` and `http.ts`
+- **Now we need to add Auth atables to the schema**
+- Add `convex/schema.ts`, here we will add all the tables for authentication.
+- ```
+    import { defineSchema } from "convex/server";
+    import { authTables } from "@convex-dev/auth/server";
+    
+    const schema = defineSchema({
+    ...authTables,
+    // Your other tables...
+    });
+    
+    export default schema;
+    ```
+- `authTables` are the set of table schema definitation precurated for Authentication. 
+- If we want to add other tables we need to add them after the authTables. Like below, we are adding tasks table after the authTables, and we are defining the table schema for tasks table by using `defineTable` method.
+- ```
+        const schema = defineSchema({
+    ...authTables,tasks: defineTable({
+        isCompleted: v.boolean(),
+        text: v.string(),
+    }),
+    // Your other tables...
+    });
+    ```
+- In last section we have added `ConvexClientProvider` to our layout, so that it was available to all pages. We need to update it to include the authentication. We need to warp our layout with `ConvexAuthNextjsServerProvider`.
+- **Add Middleware**
+- Nextjs uses `middleware.ts` to handle authentication, we need to add our own middleware to handle authentication.
+- ```
+        import { 
+            convexAuthNextjsMiddleware, 
+            createRouteMatcher, 
+            nextjsMiddlewareRedirect 
+        } from "@convex-dev/auth/nextjs/server";
+   ``` 
+- **Note**: make sure middleware.ts is inside server folder.
+- **Update middleware.ts**: Only make /auth page public, and redirect to home page if user is authenticated.
+- **Create Auth route**: Create a new folder `auth` inside app folder, and create a page.tsx file inside it. It will include the `AuthScreen` component.
+- Now we can remove `AuthScreen` component from root level `page.tsx` file.
+- At this stage, if we access any screen which is not public, it will redirect to /auth page.
 
+### Adding Github Authentication
 
-
-
+- **Update auth.ts**: Add github provider to the auth.ts file.
+- Enable github authentication in convex. 
+- Create a github oAuth app, and get the client id and client secret.
+- ` npx convex env set AUTH_GITHUB_ID yourgithubclientid`
+- ` npx convex env set AUTH_GITHUB_SECRET yourgithubclientsecret`
+- After adding this we can see these env variable in convex project settings.-> Environment variables.
+- **Note**: if we want to provide these clientId and clientsecret from our code. then we can provide that in auth.ts while initializing the github provider
+- ```
+        export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
+    providers: [GitHub({
+        clientId: "",
+        clientSecret: "",
+        })],
+    });
+    ```
+- **Active sign-in button**:
+- https://labs.convex.dev/auth/config/oauth#add-sign-in-button
+- convex provides a one methiod useAuthActions() -> this return 2 functions signIn and signOut.
+- **Update SignInCard component**:
+- ```
+        const {signIn} = useAuthActions()
+    ```
+- When login with github button is clicked, it will call signIn function with the provider name (github) as a parameter.
+- **when request is already authenticated, user is redirected to the home page:** Update middleware.ts to redirect to home page if user is authenticated.
+- **Add a signout button on home page**: use the signOut function of useAuthActions() to sign out the user, add it to home page.
+    
+- **Note**: Now when we go to any page it will redirect to Signin page, once we click on github Authentication it will redirect to github, once Authenticated it will add that user to user table and other auth info to other auth tables in Convex.
